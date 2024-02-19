@@ -1,9 +1,26 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const InMemoryCardRepository = require('../persistence/InMemoryCardRepository');
+const AddCard = require('../../application/use_case/AddCard');
+const GetCardsForReview = require('../../application/use_case/GetCardsForReview');
+
 const app = express();
 const port = 3000;
+app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
+const cardRepository = new InMemoryCardRepository();
+
+app.post('/cards', (req, res) => {
+  const addCardUseCase = new AddCard(cardRepository);
+  const card = addCardUseCase.execute(req.body);
+  res.status(201).send(card);
+});
+
+app.get('/cards/review', (req, res) => {
+  const getCardsForReviewUseCase = new GetCardsForReview(cardRepository);
+  const today = new Date(); // Simplement pour l'exemple, ajustez selon la logique de votre application
+  const cards = getCardsForReviewUseCase.execute(today);
+  res.status(200).send(cards);
 });
 
 app.listen(port, () => {
