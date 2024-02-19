@@ -1,14 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const InMemoryCardRepository = require('../persistence/InMemoryCardRepository');
+const mongoose = require('mongoose');
+const MongoCardRepository = require('../persistence/MongoCardRepository');
 const AddCard = require('../../application/use_case/AddCard');
 const GetCardsForReview = require('../../application/use_case/GetCardsForReview');
+
+mongoose.connect('mongodb://localhost/learning_cards', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const app = express();
 const port = 3000;
 app.use(bodyParser.json());
 
-const cardRepository = new InMemoryCardRepository();
+const cardRepository = new MongoCardRepository();
 
 app.post('/cards', (req, res) => {
   const addCardUseCase = new AddCard(cardRepository);
