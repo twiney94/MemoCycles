@@ -6,12 +6,14 @@ const AddCard = require('../../application/use_case/AddCard');
 const GetCardsForReview = require('../../application/use_case/GetCardsForReview');
 const User = require('../../domain/model/UserSchema');
 const jwt = require('jsonwebtoken');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 mongoose.connect('mongodb://localhost/learning_cards', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const app = express();
 const port = 3000;
 app.use(bodyParser.json());
+app.use(feedbackRoutes);
 
 const cardRepository = new MongoCardRepository();
 
