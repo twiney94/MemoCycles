@@ -7,6 +7,10 @@ class MongoCardRepository {
     return card;
   }
 
+  async getAll() {
+    return await Card.find();
+  }
+
   async findByNextReviewDate(date) {
     return await Card.find({ nextReviewDate: { $lte: date } });
   }

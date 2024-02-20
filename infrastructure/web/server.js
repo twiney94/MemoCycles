@@ -7,27 +7,23 @@ const GetCardsForReview = require('../../application/use_case/GetCardsForReview'
 const User = require('../../domain/model/UserSchema');
 const jwt = require('jsonwebtoken');
 const feedbackRoutes = require('./routes/feedbackRoutes');
-const {find} = require("../../domain/model/SessionSchema");
+const { find } = require("../../domain/model/SessionSchema");
 const Session = require("../../domain/model/SessionSchema");
 const app = express();
+require('dotenv').config();
 
-const mongoUsername = encodeURIComponent('root');
-const mongoPassword = encodeURIComponent('password');
-const mongoHost = 'localhost';
-const mongoPort = '27018'; // Le port exposé sur votre hôte local
-const mongoDatabase = 'learning_cards';
-
-const mongoUri = `mongodb://${mongoUsername}:${mongoPassword}@${mongoHost}:${mongoPort}/${mongoDatabase}?authSource=admin`;
-
-mongoose.connect(mongoUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log('Connexion à MongoDB réussie.'))
-  .catch((err) => console.error('Impossible de se connecter à MongoDB.', err));
-
-const port = 3000;
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(feedbackRoutes);
+
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/memocycles';
+mongoose.connect(mongoUri).then(() => {
+  console.log('Connected to MongoDB');
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+}).catch(err => console.error('Could not connect to MongoDB...', err));
+
 
 const cardRepository = new MongoCardRepository();
 
@@ -35,6 +31,11 @@ app.post('/cards', (req, res) => {
   const addCardUseCase = new AddCard(cardRepository);
   const card = addCardUseCase.execute(req.body);
   res.status(201).send(card);
+});
+
+app.get('/cards', (req, res) => {
+  const cards = cardRepository.getAll();
+  res.status(200).send(cards);
 });
 
 app.get('/cards/review', (req, res) => {
@@ -87,14 +88,4 @@ app.post('/sessions', async (req, res) => {
   }
 });
 
-// app.listen(port, () => {
-//   console.log(`Server running at http://localhost:${port}`);
-
 module.exports = app;
-
-  if (require.main === module) {
-  const port = 3000;
-  app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-    });
-}
