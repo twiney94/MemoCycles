@@ -53,7 +53,7 @@ app.post('/users/register', async (req, res) => {
   try {
     const user = new User(req.body);
     await user.save();
-    res.status(201).send({ user });
+    res.status(201).send({ user: { username: user.username, email: user.email }, token });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -66,7 +66,7 @@ app.post('/users/login', async (req, res) => {
       throw new Error();
     }
     const token = jwt.sign({ _id: user._id.toString() }, 'secretkey');
-    res.send({ user, token });
+    res.send({ token });
   } catch (error) {
     res.status(400).send('Unable to login');
   }
