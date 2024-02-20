@@ -27,20 +27,24 @@ mongoose.connect(mongoUri).then(() => {
 
 const cardRepository = new MongoCardRepository();
 
-app.post('/cards', (req, res) => {
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+const auth = require('./middleware/Auth');
+
+app.post('/cards', auth, (req, res) => {
   const addCardUseCase = new AddCard(cardRepository);
   const card = addCardUseCase.execute(req.body);
   res.status(201).send(card);
 });
 
-app.get('/cards', (req, res) => {
+app.get('/cards', auth, (req, res) => {
   const cards = cardRepository.getAll();
   res.status(200).send(cards);
 });
 
-app.get('/cards/review', (req, res) => {
+app.get('/cards/review', auth, (req, res) => {
   const getCardsForReviewUseCase = new GetCardsForReview(cardRepository);
-  const today = new Date(); // Simplement pour l'exemple, ajustez selon la logique de votre application
+  const today = new Date();
   const cards = getCardsForReviewUseCase.execute(today);
   res.status(200).send(cards);
 });
@@ -68,7 +72,7 @@ app.post('/users/login', async (req, res) => {
   }
 });
 
-app.get('/sessions', async (req, res) => {
+app.get('/sessions', auth, async (req, res) => {
   try {
     const sessions = await Session.findO;
     res.send(sessions);
@@ -78,7 +82,7 @@ app.get('/sessions', async (req, res) => {
     res.status(500).send();
   }
 });
-app.post('/sessions', async (req, res) => {
+app.post('/sessions', auth, async (req, res) => {
   try {
     const session = new Session({ ...req.body, userId: req.user._id });
     await session.save();

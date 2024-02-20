@@ -1,4 +1,4 @@
-import User from "../../../domain/model/UserSchema";
+const User = require('../../../domain/model/UserSchema');
 
 const auth = async (req, res, next) => {
   try {
@@ -17,6 +17,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-app.get('/some-secure-route', auth, (req, res) => {
-  res.send('Secure data');
-});
+module.exports = auth;
