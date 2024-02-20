@@ -14,12 +14,18 @@ describe('Card API', () => {
   });
 
   it('should allow creating a new card with valid token', async () => {
-    const cardData = { question: 'What is Node.js?', answer: 'Node.js is a JavaScript runtime', box: 1, nextReviewDate: new Date() };
+    const cardData = {
+      question: 'What is Node.js?',
+      answer: 'Node.js is a JavaScript runtime',
+      box: 1,
+      nextReviewDate: new Date(),
+    };
     const response = await request(app)
       .post('/cards')
       .set('Authorization', `Bearer ${authToken}`)
       .send(cardData);
     expect(response.statusCode).toBe(201);
     expect(response.body.question).toBe(cardData.question);
+    expect(response.body.box).toBe(1);
   });
 });
