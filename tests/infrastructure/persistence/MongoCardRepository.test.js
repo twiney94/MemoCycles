@@ -1,8 +1,6 @@
 const MongoCardRepository = require('../../../infrastructure/persistence/MongoCardRepository');
-const Card = require('../../../domain/model/CardSchema');
 const mongoose = require('mongoose');
 require('dotenv').config();
-
 
 describe('MongoCardRepository', () => {
     let mongoServer;
@@ -10,7 +8,7 @@ describe('MongoCardRepository', () => {
 
     beforeAll(async () => {
         const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/memocycles';
-        await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect(mongoUri);
         cardRepository = new MongoCardRepository();
     });
 

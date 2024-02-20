@@ -15,8 +15,6 @@ describe('Session API', () => {
 
 
   it('should create a new learning session', async () => {
-    console.log("token is: ", authToken);
-
     const response = await request(app)
       .post('/sessions')
       .set('Authorization', `Bearer ${authToken}`)
