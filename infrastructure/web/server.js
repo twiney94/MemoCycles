@@ -18,10 +18,12 @@ app.use(feedbackRoutes);
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/memocycles';
 mongoose.connect(mongoUri).then(() => {
   console.log('Connected to MongoDB');
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-  });
+  if (process.env.NODE_ENV !== 'test') {
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  }
 }).catch(err => console.error('Could not connect to MongoDB...', err));
 
 
@@ -31,9 +33,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const auth = require('./middleware/Auth');
 
-app.post('/cards', auth, (req, res) => {
+app.post('/cards', auth, async (req, res) => {
   const addCardUseCase = new AddCard(cardRepository);
-  const card = addCardUseCase.execute(req.body);
+  const card = await addCardUseCase.execute(req.body);
   res.status(201).send(card);
 });
 
@@ -65,7 +67,7 @@ app.post('/users/login', async (req, res) => {
     if (!user || !(await user.comparePassword(req.body.password))) {
       throw new Error();
     }
-    const token = jwt.sign({ _id: user._id.toString() }, 'secretkey');
+    const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
     res.send({ token });
   } catch (error) {
     res.status(400).send('Unable to login');
@@ -74,7 +76,7 @@ app.post('/users/login', async (req, res) => {
 
 app.get('/sessions', auth, async (req, res) => {
   try {
-    const sessions = await Session.findO;
+    const sessions = await Session.find({ userId: req.user._id });
     res.send(sessions);
   } catch (error) {
     console.log(error);

@@ -9,16 +9,12 @@ const userOne = {
   username: 'testuser',
   email: 'test@example.com',
   password: '56what!!',
-  tokens: [{
-    token: jwt.sign({ _id: userOneId }, 'secretkey')
-  }]
 };
 
 
-// Fonction pour initialiser la base de données
 const setupDatabase = async () => {
-  await User.deleteMany(); // Efface tous les utilisateurs
-  await new User(userOne).save(); // Ajoute un utilisateur de test
+  await User.deleteMany();
+  await new User(userOne).save();
 };
 
 module.exports = { setupDatabase, userOne, userOneId };
